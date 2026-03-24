@@ -19,6 +19,7 @@ export const registerOwnerController = async (req, res) => {
 
 export const registerStaffController = async (req, res) => {
   try {
+    console.log("tes aja");
     const result = await registerStaff(req.params.id, req.user.id, req.body);
 
     return successResponse(res, result, "Registration successful", 201);

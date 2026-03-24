@@ -12,7 +12,7 @@ export const registerStaffSchema = z.object({
   name: z.string().min(2),
   email: z.email(),
   password: z.string().min(8),
-  staffRoleId: z.string().optional,
+  staffRoleId: z.string().optional(),
 });
 
 export const loginSchema = z.object({

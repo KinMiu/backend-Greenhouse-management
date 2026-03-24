@@ -58,9 +58,10 @@ export const registerOwner = async (payload) => {
 };
 
 export const registerStaff = async (greenhouseId, ownerId, payload) => {
-  const {name, email, password, staffRoleId} = payload;
+  const {name, email, staffRoleId} = payload;
 
-  if (!name || !email || !password || !greenhouseId) {
+  console.log(payload);
+  if (!name || !email || !greenhouseId) {
     throw new Error("All required fields must be provided");
   }
 
@@ -102,27 +103,32 @@ export const registerStaff = async (greenhouseId, ownerId, payload) => {
     }
   }
 
-  const hashPassword = await bcrypt.hash(password, 10);
+  const hashPassword = await bcrypt.hash("12345678", 10);
 
   const user = await prisma.user.create({
     data: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      greenhouse: {
-        id: greenhouse.id,
-        name: greenhouse.name,
-        location: greenhouse.location,
-      },
-    },
-    include: {
-      staffOf: true,
+      name: name,
+      email: email,
+      password: hashPassword,
+      role: "STAFF",
+      isActive: true,
+      greenhouseId: greenhouseId,
+      staffRoleId: staffRoleId || "",
     },
   });
 
-  return user;
+  const result = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isActive: user.isActive,
+    createdAt: user.createdAt,
+    staffRoleId: user.staffRoleId,
+    staffRoles: user.staffRoles,
+  };
+
+  return result;
 };
 
 export const login = async ({email, password}) => {

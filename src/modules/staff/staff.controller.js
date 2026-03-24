@@ -3,6 +3,7 @@ import {successResponse, errorResponse} from "../../utils/response.js";
 import {
   deleteGreenhouseStaffs,
   getMyGreenhouseStaffs,
+  updateStaff,
 } from "./staff.service.js";
 
 export const getMyGreenhouseStaffsController = async (req, res) => {
@@ -19,10 +20,43 @@ export const getMyGreenhouseStaffsController = async (req, res) => {
   }
 };
 
+export const updateStaffController = async (req, res) => {
+  try {
+    console.log("ini masuk");
+    if (!req.params) {
+      return errorResponse(res, "Greenhouse and role is required", 400);
+    }
+
+    const {staffId, greenhouseId} = req.params;
+
+    const result = await updateStaff(
+      staffId,
+      greenhouseId,
+      req.user.id,
+      req.body,
+    );
+
+    return successResponse(
+      res,
+      result,
+      "Greenhouse staff role retrieved successfully",
+      200,
+    );
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, error.message, 400);
+  }
+};
+
 export const deleteGreenhouseStaffsController = async (req, res) => {
   try {
-    // console.log(req.query, req.user.id);
-    const result = await deleteGreenhouseStaffs(req.query, req.user.id);
+    if (!req.params) {
+      return errorResponse(res, "Greenhouse and role is required", 400);
+    }
+
+    const {staffId, greenhouseId} = req.params;
+
+    await deleteGreenhouseStaffs(staffId, greenhouseId, req.user.id);
 
     return successResponse(res, null, "Greenhouse deleted successfully");
   } catch (error) {
