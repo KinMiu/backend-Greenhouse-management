@@ -8,6 +8,7 @@ import userRoute from "./modules/users/user.route.js";
 import greenhouseRoute from "./modules/greenhouse/greenhouse.route.js";
 import staffRoute from "./modules/staff/staff.route.js";
 import staffRoleRoute from "./modules/staff-role/staffRole.route.js";
+import deviceRoute from "./modules/device/device.route.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/user", userRoute);
 app.use("/api/greenhouses", greenhouseRoute);
 app.use("/api/staff", staffRoute);
 app.use("/api/staff-roles", staffRoleRoute);
+app.use("/api/device", deviceRoute);
 
 app.get("/health", async (req, res) => {
   try {

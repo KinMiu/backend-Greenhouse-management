@@ -40,6 +40,8 @@ model Greenhouse {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  areas     Area[]
+  devices   Device[]
 
   @@index([ownerId])
 }
@@ -62,8 +64,47 @@ model StaffRoles {
   @@unique([name, greenhouseId])
 }
 
+model Area {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  greenhouseId String
+  greenhouse   Greenhouse @relation(fields: [greenhouseId], references: [id], onDelete: Cascade)
+
+  devices Device[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, greenhouseId])
+}
+
+model Device {
+  id   String     @id @default(uuid())
+  name String
+  type DeviceType
+
+  macAddress String?
+  status     String
+
+  greenhouseId String
+  greenhouse   Greenhouse @relation(fields: [greenhouseId], references: [id], onDelete: Cascade)
+
+  areaId String?
+  area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   SUPER_ADMIN
   OWNER
   STAFF
+}
+
+enum DeviceType {
+  SENSOR
+  ACTUATOR
 }
