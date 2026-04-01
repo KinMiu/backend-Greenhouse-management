@@ -81,18 +81,35 @@ model Area {
 }
 
 model Device {
-  id   String     @id @default(uuid())
-  name String
-  type DeviceType
+  id         String @id @default(uuid())
+  name       String
+  macAddress String @unique
 
-  macAddress String?
-  status     String
+  status   String
+  lastSeen DateTime?
 
   greenhouseId String
   greenhouse   Greenhouse @relation(fields: [greenhouseId], references: [id], onDelete: Cascade)
 
   areaId String?
   area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
+
+  components DeviceComponents[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeviceComponents {
+  id       String     @id @default(uuid())
+  name     String
+  type     DeviceType
+  category String?
+  unit     String?
+  pin      String?
+
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

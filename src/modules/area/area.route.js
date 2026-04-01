@@ -1,14 +1,14 @@
 import express from "express";
-import {
-  createDeviceController,
-  deleteDeviceController,
-  getAllDeviceController,
-  getDeviceDetailController,
-  updateDeviceController,
-} from "./device.controller.js";
 import {authorizeRole, verifyToken} from "../../middleware/auth.middleware.js";
 import {validate} from "../../middleware/validate.middleware.js";
-import {createDeviceSchema, updateDeviceSchema} from "./device.validator.js";
+import {createAreaSchema, updateUpdateSchema} from "./area.validator.js";
+import {
+  createAreaController,
+  deleteAreaController,
+  getGreenhouseAreaController,
+  getStaffRoleDetailController,
+  updateAreaController,
+} from "./area.controller.js";
 
 const router = express.Router();
 
@@ -16,37 +16,37 @@ router.get(
   "/:id/my",
   verifyToken,
   authorizeRole(["OWNER"]),
-  getAllDeviceController,
+  getGreenhouseAreaController,
 );
 
 router.post(
   "/:id",
   verifyToken,
   authorizeRole(["OWNER"]),
-  validate(createDeviceSchema),
-  createDeviceController,
+  validate(createAreaSchema),
+  createAreaController,
 );
 
 router.get(
-  "/:deviceId",
+  "/:greenhouseId/:roleId",
   verifyToken,
   authorizeRole(["OWNER"]),
-  getDeviceDetailController,
+  getStaffRoleDetailController,
 );
 
 router.patch(
   "/:greenhouseId/:roleId",
   verifyToken,
   authorizeRole(["OWNER"]),
-  validate(updateDeviceSchema),
-  updateDeviceController,
+  validate(updateUpdateSchema),
+  updateAreaController,
 );
 
 router.delete(
   "/:greenhouseId/:roleId",
   verifyToken,
   authorizeRole(["OWNER"]),
-  deleteDeviceController,
+  deleteAreaController,
 );
 
 export default router;

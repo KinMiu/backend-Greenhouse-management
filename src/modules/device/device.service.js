@@ -17,13 +17,16 @@ export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
     orderBy: {
       createdAt: "desc",
     },
+    include: {
+      components: true,
+    },
   });
 
   return devices;
 };
 
 export const createDevice = async (greenhouseId, userId, payload) => {
-  const {name, type, macAddress, status, areaId} = payload;
+  const {name, macAddress, areaId} = payload;
   console.log(payload);
 
   const greenhouse = await prisma.greenhouse.findFirst({
@@ -61,9 +64,7 @@ export const createDevice = async (greenhouseId, userId, payload) => {
   const device = await prisma.device.create({
     data: {
       name: name,
-      type: type,
       macAddress: macAddress,
-      status: "OFFLINE",
       greenhouseId: greenhouseId,
       areaId: areaId || null,
     },
@@ -72,31 +73,31 @@ export const createDevice = async (greenhouseId, userId, payload) => {
   return device;
 };
 
-export const getStaffRoleDetail = async (roleId, greenhouseId, userId) => {
-  const staffRoles = await prisma.staffRoles.findFirst({
+export const getDeviceDetail = async (deviceId, userId) => {
+  const device = await prisma.device.findFirst({
     where: {
-      id: roleId,
-      greenhouseId: greenhouseId,
+      id: deviceId,
       greenhouse: {
         ownerId: userId,
       },
     },
+    include: {
+      components: true,
+      area: true,
+    },
   });
 
-  if (!staffRoles) {
-    throw new Error("Staff role not found or access denied");
+  if (!device) {
+    throw new Error("Device not found or access denied");
   }
 
-  return staffRoles;
+  console.log(device);
+
+  return device;
 };
 
-export const updateStaffRole = async (
-  deviceId,
-  greenhouseId,
-  userId,
-  payload,
-) => {
-  const {name, type, macAddress, status, areaId} = payload;
+export const updateDevice = async (deviceId, greenhouseId, userId, payload) => {
+  const {name, macAddress, areaId} = payload;
 
   const role = await prisma.device.findFirst({
     where: {
@@ -129,9 +130,7 @@ export const updateStaffRole = async (
   console.log(name);
   console.log(macAddress);
   if (name !== undefined) dataUpdate.name = name;
-  if (type !== undefined) dataUpdate.type = type;
   if (macAddress !== undefined) dataUpdate.macAddress = macAddress;
-  if (status !== undefined) dataUpdate.status = status;
   if (areaId !== undefined) dataUpdate.areaId = areaId;
 
   console.log("data update", dataUpdate);
@@ -146,7 +145,7 @@ export const updateStaffRole = async (
   return device;
 };
 
-export const deleteStaffRole = async (deviceId, greenhouseId, userId) => {
+export const deleteDevice = async (deviceId, greenhouseId, userId) => {
   const role = await prisma.device.findFirst({
     where: {
       id: deviceId,

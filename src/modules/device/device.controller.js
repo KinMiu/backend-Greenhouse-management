@@ -2,13 +2,13 @@ import logger from "../../utils/logger.js";
 import {successResponse, errorResponse} from "../../utils/response.js";
 import {
   createDevice,
-  deleteStaffRole,
+  deleteDevice,
+  getDeviceDetail,
   getMyGreenhouseDevice,
-  getStaffRoleDetail,
-  updateStaffRole,
+  updateDevice,
 } from "./device.service.js";
 
-export const getGreenhouseStaffRolesController = async (req, res) => {
+export const getAllDeviceController = async (req, res) => {
   try {
     if (!req.params.id) {
       return errorResponse(res, "Greenhouse ID is required", 400);
@@ -18,7 +18,7 @@ export const getGreenhouseStaffRolesController = async (req, res) => {
     return successResponse(
       res,
       result,
-      "Greenhouse staff role retrieved successfully",
+      "Greenhouse devices retrieved successfully",
       200,
     );
   } catch (error) {
@@ -33,27 +33,27 @@ export const createDeviceController = async (req, res) => {
     }
     const result = await createDevice(req.params.id, req.user.id, req.body);
 
-    return successResponse(res, result, "Staff role created successfully", 201);
+    return successResponse(res, result, "Device created successfully", 201);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return errorResponse(res, error.message, 400);
   }
 };
 
-export const getStaffRoleDetailController = async (req, res) => {
+export const getDeviceDetailController = async (req, res) => {
   try {
     if (!req.params) {
       return errorResponse(res, "Greenhouse and role is required", 400);
     }
 
-    const {roleId, greenhouseId} = req.params;
+    const {deviceId} = req.params;
 
-    const result = await getStaffRoleDetail(roleId, greenhouseId, req.user.id);
+    const result = await getDeviceDetail(deviceId, req.user.id);
 
     return successResponse(
       res,
       result,
-      "Greenhouse staff role retrieved successfully",
+      "Greenhouse devices retrieved successfully",
       200,
     );
   } catch (error) {
@@ -61,7 +61,7 @@ export const getStaffRoleDetailController = async (req, res) => {
   }
 };
 
-export const updateStaffRoleController = async (req, res) => {
+export const updateDeviceController = async (req, res) => {
   try {
     if (!req.params) {
       return errorResponse(res, "Greenhouse and role is required", 400);
@@ -69,7 +69,7 @@ export const updateStaffRoleController = async (req, res) => {
 
     const {roleId, greenhouseId} = req.params;
 
-    const result = await updateStaffRole(
+    const result = await updateDevice(
       roleId,
       greenhouseId,
       req.user.id,
@@ -79,7 +79,7 @@ export const updateStaffRoleController = async (req, res) => {
     return successResponse(
       res,
       result,
-      "Greenhouse staff role retrieved successfully",
+      "Greenhouse devices retrieved successfully",
       200,
     );
   } catch (error) {
@@ -87,7 +87,7 @@ export const updateStaffRoleController = async (req, res) => {
   }
 };
 
-export const deleteStaffRoleController = async (req, res) => {
+export const deleteDeviceController = async (req, res) => {
   try {
     if (!req.params) {
       return errorResponse(res, "Greenhouse and role is required", 400);
@@ -95,12 +95,13 @@ export const deleteStaffRoleController = async (req, res) => {
 
     const {roleId, greenhouseId} = req.params;
 
-    await deleteStaffRole(roleId, greenhouseId, req.user.id);
+    await deleteDevice(roleId, greenhouseId, req.user.id);
 
     return successResponse(
       res,
-      "Greenhouse staff role retrieved successfully",
-      204,
+      null,
+      "Greenhouse devices retrieved successfully",
+      200,
     );
   } catch (error) {
     return errorResponse(res, error.message, 400);
