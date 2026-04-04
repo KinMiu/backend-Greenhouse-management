@@ -85,7 +85,7 @@ model Device {
   name       String
   macAddress String @unique
 
-  status   String
+  status   String?
   lastSeen DateTime?
 
   greenhouseId String

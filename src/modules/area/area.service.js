@@ -12,17 +12,21 @@ export const getMyGreenhouseArea = async (greenhouseId, userId) => {
     throw new Error("Greenhouse not found or access denied");
   }
 
-  const devices = await prisma.area.findMany({
+  const areas = await prisma.area.findMany({
     where: {greenhouseId: greenhouseId},
     include: {
-      devices: true,
+      devices: {
+        include: {
+          components: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
-  return devices;
+  return areas;
 };
 
 export const createArea = async (greenhouseId, userId, payload) => {

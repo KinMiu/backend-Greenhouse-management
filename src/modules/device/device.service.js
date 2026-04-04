@@ -91,8 +91,6 @@ export const getDeviceDetail = async (deviceId, userId) => {
     throw new Error("Device not found or access denied");
   }
 
-  console.log(device);
-
   return device;
 };
 
