@@ -1,6 +1,11 @@
 import {prisma} from "../../config/prisma.js";
 
-export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
+export const getMyGreenhouseAutomation = async (
+  greenhouseId,
+  deviceId,
+  componentId,
+  userId,
+) => {
   const greenhouse = await prisma.greenhouse.findUnique({
     where: {
       id: greenhouseId,
@@ -12,21 +17,18 @@ export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
     throw new Error("Greenhouse not found or access denied");
   }
 
-  const devices = await prisma.device.findMany({
-    where: {greenhouseId: greenhouseId},
+  const configData = await prisma.automation.findMany({
+    where: {deviceId: deviceId, componentId: componentId},
     orderBy: {
       createdAt: "desc",
     },
-    include: {
-      components: true,
-    },
   });
 
-  return devices;
+  return condigData;
 };
 
-export const createDevice = async (greenhouseId, userId, payload) => {
-  const {name, macAddress, areaId} = payload;
+export const createAutomation = async (greenhouseId, userId, payload) => {
+  const {deviceId, componentId, action, time, duration} = payload;
   console.log(payload);
 
   const greenhouse = await prisma.greenhouse.findFirst({
@@ -40,10 +42,10 @@ export const createDevice = async (greenhouseId, userId, payload) => {
     throw new Error("Greenhouse not found or access denied");
   }
 
-  if (areaId) {
-    const area = await prisma.area.findFirst({
+  if (deviceId) {
+    const area = await prisma.device.findFirst({
       where: {
-        id: areaId,
+        id: deviceId,
         greenhouseId: greenhouseId,
       },
     });
@@ -53,27 +55,21 @@ export const createDevice = async (greenhouseId, userId, payload) => {
     }
   }
 
-  const checkMac = await prisma.device.findFirst({
-    where: {macAddress: macAddress},
-  });
-
-  if (checkMac) {
-    throw new Error("This MAC Address is already registered to another device");
-  }
-
-  const device = await prisma.device.create({
+  const saveConfigData = await prisma.automation.create({
     data: {
-      name: name,
-      macAddress: macAddress,
-      greenhouseId: greenhouseId,
-      areaId: areaId || null,
+      deviceId: deviceId,
+      componentId: componentId,
+      action: action,
+      time: time,
+      duration: duration,
+      isActive: true,
     },
   });
 
-  return device;
+  return saveConfigData;
 };
 
-export const getDeviceDetail = async (deviceId, userId) => {
+export const getAutomationDetail = async (deviceId, userId) => {
   const device = await prisma.device.findFirst({
     where: {
       id: deviceId,
@@ -99,7 +95,12 @@ export const getDeviceDetail = async (deviceId, userId) => {
   return device;
 };
 
-export const updateDevice = async (deviceId, greenhouseId, userId, payload) => {
+export const updateAutomation = async (
+  deviceId,
+  greenhouseId,
+  userId,
+  payload,
+) => {
   const {name, macAddress, areaId} = payload;
 
   const role = await prisma.device.findFirst({
@@ -148,7 +149,7 @@ export const updateDevice = async (deviceId, greenhouseId, userId, payload) => {
   return device;
 };
 
-export const deleteDevice = async (deviceId, greenhouseId, userId) => {
+export const deleteAutomation = async (deviceId, greenhouseId, userId) => {
   const role = await prisma.device.findFirst({
     where: {
       id: deviceId,

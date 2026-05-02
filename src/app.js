@@ -10,7 +10,14 @@ import staffRoute from "./modules/staff/staff.route.js";
 import staffRoleRoute from "./modules/staff-role/staffRole.route.js";
 import deviceRoute from "./modules/device/device.route.js";
 import deviceComponentsRoute from "./modules/device-components/device-components.route.js";
+import deviceComponentSensorRoute from "./modules/device-component-sensor/device-component-sensor.route.js";
 import areaRoute from "./modules/area/area.route.js";
+import logger from "./utils/logger.js";
+import {requireApiKey} from "./middleware/apiKey.middleware.js";
+import {
+  authLimiter,
+  globalLimiter,
+} from "./middleware/rateLimiter.middaleware.js";
 
 const app = express();
 
@@ -20,12 +27,22 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
+
 app.use(express.json());
+
+app.use(globalLimiter);
 
 app.get("/", (req, res) => {
   res.json({message: "Welcome to GH MAnagement System"});
 });
+
+app.use("/api", requireApiKey());
 
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
@@ -34,6 +51,7 @@ app.use("/api/staff", staffRoute);
 app.use("/api/staff-roles", staffRoleRoute);
 app.use("/api/device", deviceRoute);
 app.use("/api/device-components", deviceComponentsRoute);
+app.use("/api/device-component-sensor", deviceComponentSensorRoute);
 app.use("/api/areas", areaRoute);
 
 app.get("/health", async (req, res) => {

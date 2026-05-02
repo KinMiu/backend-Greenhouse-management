@@ -143,7 +143,6 @@ export const login = async ({email, password}) => {
       isActive: true,
     },
   });
-  console.log(user);
 
   if (!user) {
     throw new Error("Invalid email or password");
@@ -190,6 +189,20 @@ export const getMe = async (userId) => {
       email: true,
       role: true,
       isActive: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
+
+export const logout = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
     },
   });
 

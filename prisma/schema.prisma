@@ -85,7 +85,6 @@ model Device {
   name       String
   macAddress String @unique
 
-  status   String?
   lastSeen DateTime?
 
   greenhouseId String
@@ -96,8 +95,24 @@ model Device {
 
   components DeviceComponents[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  sensorDatas SensorData[]
+
+  statusLogs  DeviceStatusLog[]
+  automations Automation[]
+}
+
+model DeviceStatusLog {
+  id String @id @default(uuid())
+
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  state  String
+  reason String?
+
+  createAt DateTime @default(now())
 }
 
 model DeviceComponents {
@@ -110,6 +125,47 @@ model DeviceComponents {
 
   deviceId String
   device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  sensorDatas SensorData[]
+  automations Automation[]
+}
+
+model SensorData {
+  id String @id @default(uuid())
+
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  componentId String?
+  component   DeviceComponents? @relation(fields: [componentId], references: [id])
+
+  type  String?
+  value Float
+  unit  String?
+
+  deviceTime DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Automation {
+  id String @id @default(uuid())
+
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  componentId String
+  component   DeviceComponents? @relation(fields: [componentId], references: [id])
+
+  action String
+
+  time     String
+  duration Int
+
+  isActive Boolean
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
