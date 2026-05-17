@@ -4,6 +4,7 @@ import {validate} from "../../middleware/validate.middleware.js";
 import {
   createAutomationController,
   deleteAutomationController,
+  getAllAutomationByAreaController,
   getAllAutomationController,
   getAutomationDetailController,
   updateAutomationController,
@@ -22,6 +23,13 @@ router.get(
   getAllAutomationController,
 );
 
+router.get(
+  "/:idgreenhouse/:idArea",
+  verifyToken,
+  authorizeRole(["OWNER"]),
+  getAllAutomationByAreaController,
+);
+
 router.post(
   "/:id",
   verifyToken,
@@ -38,7 +46,7 @@ router.get(
 );
 
 router.patch(
-  "/:greenhouseId/:roleId",
+  "/:greenhouseId/:id",
   verifyToken,
   authorizeRole(["OWNER"]),
   validate(updateAutomationSchema),
@@ -46,7 +54,7 @@ router.patch(
 );
 
 router.delete(
-  "/:greenhouseId/:roleId",
+  "/:greenhouseId/:id",
   verifyToken,
   authorizeRole(["OWNER"]),
   deleteAutomationController,

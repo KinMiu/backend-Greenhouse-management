@@ -5,8 +5,8 @@ import {createAreaSchema, updateUpdateSchema} from "./area.validator.js";
 import {
   createAreaController,
   deleteAreaController,
+  getAreaDetailController,
   getGreenhouseAreaController,
-  getStaffRoleDetailController,
   updateAreaController,
 } from "./area.controller.js";
 
@@ -28,10 +28,10 @@ router.post(
 );
 
 router.get(
-  "/:greenhouseId/:roleId",
+  "/:areaId",
   verifyToken,
   authorizeRole(["OWNER"]),
-  getStaffRoleDetailController,
+  getAreaDetailController,
 );
 
 router.patch(

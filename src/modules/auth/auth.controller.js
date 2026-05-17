@@ -36,7 +36,7 @@ export const loginController = async (req, res) => {
 
     res.cookie("user_role", result.user.role, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       maxAge: duration,
       path: "/",
       sameSite: "lax",

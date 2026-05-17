@@ -5,12 +5,17 @@ import {
   deleteAutomation,
   getAutomationDetail,
   getMyGreenhouseAutomation,
+  getMyGreenhouseAutomationByArea,
   updateAutomation,
 } from "./automation.service.js";
 
 export const getAllAutomationController = async (req, res) => {
   try {
-    if (!req.params.id) {
+    if (
+      !req.params.idgreenhouse ||
+      !req.params.iddevice ||
+      !req.params.idcomponent
+    ) {
       return errorResponse(res, "Greenhouse ID is required", 400);
     }
     const result = await getMyGreenhouseAutomation(
@@ -23,7 +28,29 @@ export const getAllAutomationController = async (req, res) => {
     return successResponse(
       res,
       result,
-      "Greenhouse devices retrieved successfully",
+      "Schedule devices retrieved successfully",
+      200,
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
+export const getAllAutomationByAreaController = async (req, res) => {
+  try {
+    if (!req.params.idgreenhouse || !req.params.idArea) {
+      return errorResponse(res, "Greenhouse ID is required", 400);
+    }
+    const result = await getMyGreenhouseAutomationByArea(
+      req.params.idgreenhouse,
+      req.params.idArea,
+      req.user.id,
+    );
+
+    return successResponse(
+      res,
+      result,
+      "Schedule devices retrieved successfully",
       200,
     );
   } catch (error) {
@@ -38,7 +65,7 @@ export const createAutomationController = async (req, res) => {
     }
     const result = await createAutomation(req.params.id, req.user.id, req.body);
 
-    return successResponse(res, result, "Device created successfully", 201);
+    return successResponse(res, result, "Schedule created successfully", 201);
   } catch (error) {
     logger.error(error);
     return errorResponse(res, error.message, 400);
@@ -72,10 +99,10 @@ export const updateAutomationController = async (req, res) => {
       return errorResponse(res, "Greenhouse and role is required", 400);
     }
 
-    const {roleId, greenhouseId} = req.params;
+    const {id, greenhouseId} = req.params;
 
     const result = await updateAutomation(
-      roleId,
+      id,
       greenhouseId,
       req.user.id,
       req.body,
@@ -98,9 +125,9 @@ export const deleteAutomationController = async (req, res) => {
       return errorResponse(res, "Greenhouse and role is required", 400);
     }
 
-    const {roleId, greenhouseId} = req.params;
+    const {id, greenhouseId} = req.params;
 
-    await deleteAutomation(roleId, greenhouseId, req.user.id);
+    await deleteAutomation(id, greenhouseId, req.user.id);
 
     return successResponse(
       res,

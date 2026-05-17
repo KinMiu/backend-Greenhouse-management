@@ -24,7 +24,44 @@ export const getMyGreenhouseAutomation = async (
     },
   });
 
-  return condigData;
+  return configData;
+};
+
+export const getMyGreenhouseAutomationByArea = async (
+  greenhouseId,
+  areaId,
+  userId,
+) => {
+  const greenhouse = await prisma.greenhouse.findUnique({
+    where: {
+      id: greenhouseId,
+      ownerId: userId,
+    },
+  });
+
+  if (!greenhouse || greenhouse.ownerId !== userId) {
+    throw new Error("Greenhouse not found or access denied");
+  }
+
+  const configData = await prisma.automation.findMany({
+    where: {
+      device: {
+        areaId: areaId,
+        greenhouseId: greenhouseId,
+      },
+    },
+    include: {
+      device: true,
+      component: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  // console.log(configData);
+
+  return configData;
 };
 
 export const createAutomation = async (greenhouseId, userId, payload) => {
@@ -43,15 +80,15 @@ export const createAutomation = async (greenhouseId, userId, payload) => {
   }
 
   if (deviceId) {
-    const area = await prisma.device.findFirst({
+    const device = await prisma.device.findFirst({
       where: {
         id: deviceId,
         greenhouseId: greenhouseId,
       },
     });
 
-    if (!area) {
-      throw new Error("Area not found in this greenhouse");
+    if (!device) {
+      throw new Error("Device not found in this greenhouse");
     }
   }
 
@@ -95,80 +132,71 @@ export const getAutomationDetail = async (deviceId, userId) => {
   return device;
 };
 
-export const updateAutomation = async (
-  deviceId,
-  greenhouseId,
-  userId,
-  payload,
-) => {
-  const {name, macAddress, areaId} = payload;
+export const updateAutomation = async (id, greenhouseId, userId, payload) => {
+  const {deviceId, componentId, action, time, duration, isActive} = payload;
 
-  const role = await prisma.device.findFirst({
+  const greenhouse = await prisma.greenhouse.findFirst({
     where: {
-      id: deviceId,
-      greenhouseId: greenhouseId,
-      greenhouse: {
-        ownerId: userId,
-      },
+      id: greenhouseId,
+      ownerId: userId,
     },
   });
 
-  if (!role) {
-    throw new Error("Staff role not found or access denied");
+  if (!greenhouse || greenhouse.ownerId !== userId) {
+    throw new Error("Greenhouse not found or access denied");
   }
 
-  if (macAddress !== undefined && macAddress.trim() !== "") {
-    const checkMac = await prisma.device.findFirst({
-      where: {macAddress: macAddress},
+  if (deviceId) {
+    const device = await prisma.device.findFirst({
+      where: {
+        id: deviceId,
+        greenhouseId: greenhouseId,
+      },
     });
 
-    if (checkMac && checkMac.id !== deviceId) {
-      throw new Error(
-        "This MAC Address is already registered to another device",
-      );
+    if (!device) {
+      throw new Error("Device not found in this greenhouse");
     }
   }
 
   const dataUpdate = {};
 
-  console.log(name);
-  console.log(macAddress);
-  if (name !== undefined) dataUpdate.name = name;
-  if (macAddress !== undefined) dataUpdate.macAddress = macAddress;
-  if (areaId !== undefined) dataUpdate.areaId = areaId;
+  if (deviceId !== undefined) dataUpdate.deviceId = deviceId;
+  if (componentId !== undefined) dataUpdate.componentId = componentId;
+  if (action !== undefined) dataUpdate.action = action;
+  if (time !== undefined) dataUpdate.time = time;
+  if (duration !== undefined) dataUpdate.duration = duration;
+  if (isActive !== undefined) dataUpdate.isActive = isActive;
 
   console.log("data update", dataUpdate);
 
-  const device = await prisma.device.update({
+  const automation = await prisma.automation.update({
     where: {
-      id: deviceId,
+      id: id,
     },
     data: dataUpdate,
   });
 
-  return device;
+  return automation;
 };
 
-export const deleteAutomation = async (deviceId, greenhouseId, userId) => {
-  const role = await prisma.device.findFirst({
+export const deleteAutomation = async (id, greenhouseId, userId) => {
+  const greenhouse = await prisma.greenhouse.findFirst({
     where: {
-      id: deviceId,
-      greenhouseId: greenhouseId,
-      greenhouse: {
-        ownerId: userId,
-      },
+      id: greenhouseId,
+      ownerId: userId,
     },
   });
 
-  if (!role) {
-    throw new Error("Staff role not found or access denied");
+  if (!greenhouse || greenhouse.ownerId !== userId) {
+    throw new Error("Greenhouse not found or access denied");
   }
 
-  const staffRoles = await prisma.device.delete({
+  const automation = await prisma.automation.delete({
     where: {
-      id: deviceId,
+      id: id,
     },
   });
 
-  return staffRoles;
+  return automation;
 };

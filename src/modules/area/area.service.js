@@ -55,22 +55,28 @@ export const createArea = async (greenhouseId, userId, payload) => {
   return area;
 };
 
-export const getStaffRoleDetail = async (roleId, greenhouseId, userId) => {
-  const staffRoles = await prisma.staffRoles.findFirst({
+export const getAreaDetail = async (areaId, userId) => {
+  const area = await prisma.area.findFirst({
     where: {
-      id: roleId,
-      greenhouseId: greenhouseId,
+      id: areaId,
       greenhouse: {
         ownerId: userId,
       },
     },
+    include: {
+      devices: {
+        include: {
+          components: true,
+        },
+      },
+    },
   });
 
-  if (!staffRoles) {
-    throw new Error("Staff role not found or access denied");
+  if (!area) {
+    throw new Error("Area not found or access denied");
   }
 
-  return staffRoles;
+  return area;
 };
 
 export const updateArea = async (areaId, greenhouseId, userId, payload) => {

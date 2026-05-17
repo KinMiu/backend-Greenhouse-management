@@ -2,6 +2,7 @@ import {successResponse, errorResponse} from "../../utils/response.js";
 import {
   createArea,
   deleteArea,
+  getAreaDetail,
   getMyGreenhouseArea,
   updateArea,
 } from "./area.service.js";
@@ -39,15 +40,16 @@ export const createAreaController = async (req, res) => {
   }
 };
 
-export const getStaffRoleDetailController = async (req, res) => {
+export const getAreaDetailController = async (req, res) => {
   try {
     if (!req.params) {
-      return errorResponse(res, "Greenhouse and role is required", 400);
+      return errorResponse(res, "AreaId is required", 400);
     }
 
-    const {roleId, greenhouseId} = req.params;
+    const {areaId} = req.params;
+    console.log(areaId);
 
-    const result = await getStaffRoleDetail(roleId, greenhouseId, req.user.id);
+    const result = await getAreaDetail(areaId, req.user.id);
 
     return successResponse(res, result, "Area retrieved successfully", 200);
   } catch (error) {
