@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import {prisma} from "./config/prisma.js";
 
 // routes
 import authRoute from "./modules/auth/auth.route.js";
@@ -14,6 +13,7 @@ import deviceComponentSensorRoute from "./modules/device-component-sensor/device
 import areaRoute from "./modules/area/area.route.js";
 import automationRoute from "./modules/automation/automation.route.js";
 
+import {prisma} from "./config/prisma.js";
 import logger from "./utils/logger.js";
 import {requireApiKey} from "./middleware/apiKey.middleware.js";
 import {

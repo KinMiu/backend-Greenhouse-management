@@ -1,4 +1,6 @@
 import {prisma} from "../../config/prisma.js";
+import {getChannel} from "../../utils/amqp.js";
+import logger from "../../utils/logger.js";
 
 export const getMyGreenhouseAutomation = async (
   greenhouseId,
@@ -101,7 +103,42 @@ export const createAutomation = async (greenhouseId, userId, payload) => {
       duration: duration,
       isActive: true,
     },
+    include: {
+      device: true,
+      component: true,
+    },
   });
+
+  try {
+    const channel = getChannel();
+    const queueName = "automation:sync";
+
+    await channel.assertQueue(queueName, {durable: true});
+
+    const syncPayload = {
+      eventType: "Created",
+      data: {
+        id: saveConfigData.id,
+        macaddress: saveConfigData.device.macAddress,
+        deviceId: saveConfigData.deviceId,
+        componentId: saveConfigData.componentId,
+        pin: saveConfigData.component.pin,
+        action: saveConfigData.action,
+        time: saveConfigData.time,
+        duration: saveConfigData.duration,
+      },
+    };
+
+    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(syncPayload)), {
+      persistent: true,
+    });
+
+    logger.info(
+      `[AMQP] Success send created event for schedule ${saveConfigData.id}`,
+    );
+  } catch (error) {
+    logger.error("Failed to send new schedule to AMQP", error.message);
+  }
 
   return saveConfigData;
 };
@@ -175,7 +212,42 @@ export const updateAutomation = async (id, greenhouseId, userId, payload) => {
       id: id,
     },
     data: dataUpdate,
+    include: {
+      device: true,
+      component: true,
+    },
   });
+
+  try {
+    const channel = getChannel();
+    const queueName = "automation:sync";
+
+    await channel.assertQueue(queueName, {durable: true});
+
+    const syncPayload = {
+      eventType: "Updated",
+      data: {
+        id: automation.id,
+        macAddress: automation.device.macAddress,
+        deviceId: automation.deviceId,
+        componentId: automation.componentId,
+        pin: automation.component.pin,
+        action: automation.action,
+        time: automation.time,
+        duration: automation.duration,
+      },
+    };
+
+    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(syncPayload)), {
+      persistent: true,
+    });
+
+    logger.info(
+      `[AMQP] Success send updated event for schedule ${automation.id}`,
+    );
+  } catch (error) {
+    logger.error("Failed to send update schedule to AMQP", error.message);
+  }
 
   return automation;
 };
@@ -197,6 +269,30 @@ export const deleteAutomation = async (id, greenhouseId, userId) => {
       id: id,
     },
   });
+
+  try {
+    const channel = getChannel();
+    const queueName = "automation:sync";
+
+    await channel.assertQueue(queueName, {durable: true});
+
+    const syncPayload = {
+      eventType: "Deleted",
+      data: {
+        id: automation.id,
+      },
+    };
+
+    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(syncPayload)), {
+      persistent: true,
+    });
+
+    logger.info(
+      `[AMQP] Success send deleted event for schedule ID: ${automation.id}`,
+    );
+  } catch (error) {
+    logger.error("Failed to send delete schedule to AMQP", error.message);
+  }
 
   return automation;
 };
