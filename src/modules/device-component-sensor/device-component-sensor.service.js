@@ -1,6 +1,6 @@
 import {prisma} from "../../config/prisma.js";
 import logger from "../../utils/logger.js";
-import mqttClient from "../../utils/mqtt.js";
+import {mqttClient} from "../../utils/mqtt.js";
 
 export const getMyGreenhouseDeviceComponentSensor = async (
   greenhouseId,
