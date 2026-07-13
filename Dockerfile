@@ -20,4 +20,4 @@ RUN npx prisma generate
 EXPOSE 3001
 
 # 8. Command untuk menjalankan backend
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
