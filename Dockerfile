@@ -17,7 +17,7 @@ COPY . .
 RUN npx prisma generate
 
 # 7. Expose port backend Anda (misal port 5000, sesuaikan dengan port backend Anda)
-EXPOSE 3001
+EXPOSE 5002
 
 # 8. Command untuk menjalankan backend
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
