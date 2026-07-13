@@ -5,15 +5,34 @@ import {
   deleteDevice,
   getDeviceDetail,
   getMyGreenhouseDevice,
+  getMyGreenhouseDeviceByGreenhouse,
   updateDevice,
 } from "./device.service.js";
 
 export const getAllDeviceController = async (req, res) => {
   try {
+    const result = await getMyGreenhouseDevice(req.user.id);
+
+    return successResponse(
+      res,
+      result,
+      "Greenhouse devices retrieved successfully",
+      200,
+    );
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
+export const getAllDeviceControllerByGreenhouse = async (req, res) => {
+  try {
     if (!req.params.id) {
       return errorResponse(res, "Greenhouse ID is required", 400);
     }
-    const result = await getMyGreenhouseDevice(req.params.id, req.user.id);
+    const result = await getMyGreenhouseDeviceByGreenhouse(
+      req.params.id,
+      req.user.id,
+    );
 
     return successResponse(
       res,
@@ -28,10 +47,7 @@ export const getAllDeviceController = async (req, res) => {
 
 export const createDeviceController = async (req, res) => {
   try {
-    if (!req.params.id) {
-      return errorResponse(res, "Greenhouse ID is required", 400);
-    }
-    const result = await createDevice(req.params.id, req.user.id, req.body);
+    const result = await createDevice(req.user.id, req.body);
 
     return successResponse(res, result, "Device created successfully", 201);
   } catch (error) {
@@ -48,7 +64,7 @@ export const getDeviceDetailController = async (req, res) => {
 
     const {deviceId} = req.params;
 
-    const result = await getDeviceDetail(deviceId, req.user.id);
+    const result = await getDeviceDetail(deviceId, req.user);
 
     return successResponse(
       res,

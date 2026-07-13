@@ -1,6 +1,37 @@
 import {prisma} from "../../config/prisma.js";
 
-export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
+export const getMyGreenhouseDevice = async (userId) => {
+  const superAdminValidation = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!superAdminValidation || superAdminValidation.role !== "SUPER_ADMIN") {
+    throw new Error("access denied");
+  }
+
+  const devices = await prisma.device.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      components: true,
+      greenhouse: {
+        include: {
+          owner: true,
+        },
+      },
+    },
+  });
+
+  return devices;
+};
+
+export const getMyGreenhouseDeviceByGreenhouse = async (
+  greenhouseId,
+  userId,
+) => {
   const greenhouse = await prisma.greenhouse.findUnique({
     where: {
       id: greenhouseId,
@@ -25,32 +56,16 @@ export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
   return devices;
 };
 
-export const createDevice = async (greenhouseId, userId, payload) => {
-  const {name, macAddress, areaId} = payload;
-  console.log(payload);
-
-  const greenhouse = await prisma.greenhouse.findFirst({
+export const createDevice = async (userId, payload) => {
+  const {name, macAddress} = payload;
+  const superAdminValidation = await prisma.user.findUnique({
     where: {
-      id: greenhouseId,
-      ownerId: userId,
+      id: userId,
     },
   });
 
-  if (!greenhouse || greenhouse.ownerId !== userId) {
-    throw new Error("Greenhouse not found or access denied");
-  }
-
-  if (areaId) {
-    const area = await prisma.area.findFirst({
-      where: {
-        id: areaId,
-        greenhouseId: greenhouseId,
-      },
-    });
-
-    if (!area) {
-      throw new Error("Area not found in this greenhouse");
-    }
+  if (!superAdminValidation || superAdminValidation.role !== "SUPER_ADMIN") {
+    throw new Error("access denied");
   }
 
   const checkMac = await prisma.device.findFirst({
@@ -65,21 +80,16 @@ export const createDevice = async (greenhouseId, userId, payload) => {
     data: {
       name: name,
       macAddress: macAddress,
-      greenhouseId: greenhouseId,
-      areaId: areaId || null,
     },
   });
 
   return device;
 };
 
-export const getDeviceDetail = async (deviceId, userId) => {
+export const getDeviceDetail = async (deviceId, user) => {
   const device = await prisma.device.findFirst({
     where: {
       id: deviceId,
-      greenhouse: {
-        ownerId: userId,
-      },
     },
     include: {
       components: true,
@@ -89,11 +99,24 @@ export const getDeviceDetail = async (deviceId, userId) => {
           createAt: "desc",
         },
       },
+      greenhouse: {
+        include: {
+          owner: true,
+        },
+      },
     },
   });
+  console.log(device);
 
-  if (!device) {
-    throw new Error("Device not found or access denied");
+  if (device.greenhouse === null) {
+    if (user.role !== "SUPER_ADMIN") {
+      throw new Error("Device not found or access denied");
+    }
+    return device;
+  }
+
+  if (device.greenhouse.ownerId !== user.id) {
+    throw new Error("Greenhouse not found or access denied");
   }
 
   return device;

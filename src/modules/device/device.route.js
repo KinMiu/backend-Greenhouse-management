@@ -3,6 +3,7 @@ import {
   createDeviceController,
   deleteDeviceController,
   getAllDeviceController,
+  getAllDeviceControllerByGreenhouse,
   getDeviceDetailController,
   updateDeviceController,
 } from "./device.controller.js";
@@ -13,16 +14,23 @@ import {createDeviceSchema, updateDeviceSchema} from "./device.validator.js";
 const router = express.Router();
 
 router.get(
-  "/:id/my",
+  "/",
   verifyToken,
-  authorizeRole(["OWNER"]),
+  authorizeRole(["SUPER_ADMIN"]),
   getAllDeviceController,
 );
 
-router.post(
-  "/:id",
+router.get(
+  "/:id/my",
   verifyToken,
   authorizeRole(["OWNER"]),
+  getAllDeviceControllerByGreenhouse,
+);
+
+router.post(
+  "/",
+  verifyToken,
+  authorizeRole(["SUPER_ADMIN"]),
   validate(createDeviceSchema),
   createDeviceController,
 );
@@ -30,7 +38,7 @@ router.post(
 router.get(
   "/:deviceId",
   verifyToken,
-  authorizeRole(["OWNER"]),
+  authorizeRole(["OWNER", "SUPER_ADMIN"]),
   getDeviceDetailController,
 );
 

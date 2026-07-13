@@ -87,8 +87,8 @@ model Device {
 
   lastSeen DateTime?
 
-  greenhouseId String
-  greenhouse   Greenhouse @relation(fields: [greenhouseId], references: [id], onDelete: Cascade)
+  greenhouseId String?
+  greenhouse   Greenhouse? @relation(fields: [greenhouseId], references: [id], onDelete: Cascade)
 
   areaId String?
   area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)

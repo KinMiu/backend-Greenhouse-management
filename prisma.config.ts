@@ -3,6 +3,14 @@
 import "dotenv/config";
 import {defineConfig} from "prisma/config";
 
+let DATABASE_URL;
+
+if (process.env.NODE_ENV === "development") {
+  DATABASE_URL = process.env.DATABASE_URL_DEV;
+} else {
+  DATABASE_URL = process.env.DATABASE_URL_PROD;
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -10,6 +18,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: DATABASE_URL,
   },
 });
