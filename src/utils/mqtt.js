@@ -13,6 +13,8 @@ if (!brokerUrl) {
   );
 }
 
+logger.info(`Memuat MQTT Broker URL: ${brokerUrl}`);
+
 export const mqttClient = mqtt.connect(brokerUrl, {
   username: process.env.MQTT_USERNAME,
   password: process.env.MQTT_PASSWORD,
