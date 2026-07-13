@@ -13,7 +13,7 @@ if (!brokerUrl) {
   );
 }
 
-const mqttClient = mqtt.connect(brokerUrl, {
+export const mqttClient = mqtt.connect(brokerUrl, {
   username: process.env.MQTT_USERNAME,
   password: process.env.MQTT_PASSWORD,
   clientId: `${clientIdPrefix}${Math.random().toString(16).slice(3)}`,
