@@ -2,8 +2,6 @@ import dotenv from "dotenv";
 import mqtt from "mqtt";
 import logger from "./logger.js";
 
-dotenv.config();
-
 const brokerUrl = process.env.MQTT_BROKER_URL;
 const clientIdPrefix = process.env.MQTT_CLIENT_PREFIX || "GH_iot_system_";
 
