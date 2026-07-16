@@ -23,6 +23,8 @@ import {
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 process.on("SIGINT", async () => {
   logger.info("Shutting down...");
   await prisma.$disconnect();

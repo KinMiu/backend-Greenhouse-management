@@ -13,8 +13,6 @@ RUN npm install
 # 5. Copy seluruh sisa file project Anda ke dalam container
 COPY . .
 
-RUN npx prisma migrate deploy
-
 # 6. Generate Prisma Client di dalam container agar sesuai arsitektur Linux Alpine
 RUN npx prisma generate
 
