@@ -9,6 +9,6 @@ export default defineConfig({
   },
   datasource: {
     // Biarkan Prisma membaca variabel DATABASE_URL secara langsung dan universal
-    url: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL_PROD,
   },
 });

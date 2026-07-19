@@ -5,9 +5,10 @@ export const createComponentSchema = z.object({
     .string({required_error: "Name is required"})
     .min(2, "Name must be at least 2 characters")
     .trim(),
-  type: z.enum(["SENSOR", "ACTUATOR"], {
+  type: z.enum(["SENSOR", "ACTUATOR", "CAMERA"], {
     required_error: "Type is required",
-    invalid_type_error: "Type must be exactly 'SENSOR' or 'ACTUATOR'",
+    invalid_type_error:
+      "Type must be exactly 'SENSOR' or 'ACTUATOR' OR 'CAMERA'",
   }),
   category: z.string().optional(),
   unit: z.string().optional(),

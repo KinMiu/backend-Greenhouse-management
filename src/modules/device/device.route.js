@@ -43,9 +43,9 @@ router.get(
 );
 
 router.patch(
-  "/:greenhouseId/:roleId",
+  "/:greenhouseId/:deviceId",
   verifyToken,
-  authorizeRole(["OWNER"]),
+  authorizeRole(["OWNER", "SUPER_ADMIN"]),
   validate(updateDeviceSchema),
   updateDeviceController,
 );

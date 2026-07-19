@@ -29,17 +29,9 @@ export const getAllDeviceController = async (req, res) => {
 
 export const createDeviceComponentController = async (req, res) => {
   try {
-    if (!req.params) {
-      return errorResponse(res, "Greenhouse and device is required", 400);
-    }
-
-    const {id, greenhouseId} = req.params;
-    const result = await createDeviceComponent(
-      id,
-      greenhouseId,
-      req.user.id,
-      req.body,
-    );
+    const {id} = req.params;
+    console.log(req.body);
+    const result = await createDeviceComponent(id, req.user.id, req.body);
 
     return successResponse(res, result, "Device created successfully", 201);
   } catch (error) {

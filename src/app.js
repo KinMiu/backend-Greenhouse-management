@@ -33,8 +33,8 @@ process.on("SIGINT", async () => {
 
 app.use(
   cors({
-    // origin: "http://localhost:3000",
-    origin: "https://urken.psti-ubl.id",
+    origin: "http://localhost:3000",
+    // origin: "https://urken.psti-ubl.id",
     credentials: true,
   }),
 );

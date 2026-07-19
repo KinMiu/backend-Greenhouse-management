@@ -180,4 +180,5 @@ enum Role {
 enum DeviceType {
   SENSOR
   ACTUATOR
+  CAMERA
 }

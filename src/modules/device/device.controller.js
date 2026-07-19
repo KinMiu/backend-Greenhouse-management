@@ -80,13 +80,13 @@ export const getDeviceDetailController = async (req, res) => {
 export const updateDeviceController = async (req, res) => {
   try {
     if (!req.params) {
-      return errorResponse(res, "Greenhouse and role is required", 400);
+      return errorResponse(res, "Greenhouse and deviceId is required", 400);
     }
 
-    const {roleId, greenhouseId} = req.params;
+    const {deviceId, greenhouseId} = req.params;
 
     const result = await updateDevice(
-      roleId,
+      deviceId,
       greenhouseId,
       req.user.id,
       req.body,

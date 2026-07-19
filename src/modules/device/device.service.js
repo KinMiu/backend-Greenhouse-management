@@ -106,7 +106,7 @@ export const getDeviceDetail = async (deviceId, user) => {
       },
     },
   });
-  console.log(device);
+  // console.log(device);
 
   if (device.greenhouse === null) {
     if (user.role !== "SUPER_ADMIN") {
@@ -115,8 +115,11 @@ export const getDeviceDetail = async (deviceId, user) => {
     return device;
   }
 
-  if (device.greenhouse.ownerId !== user.id) {
-    throw new Error("Greenhouse not found or access denied");
+  console.log(user.role);
+  if (user.role !== "SUPER_ADMIN") {
+    if (device.greenhouse.ownerId !== user.id) {
+      throw new Error("Greenhouse not found or access denied");
+    }
   }
 
   return device;
@@ -125,18 +128,18 @@ export const getDeviceDetail = async (deviceId, user) => {
 export const updateDevice = async (deviceId, greenhouseId, userId, payload) => {
   const {name, macAddress, areaId} = payload;
 
-  const role = await prisma.device.findFirst({
+  const device = await prisma.device.findUnique({
     where: {
       id: deviceId,
-      greenhouseId: greenhouseId,
-      greenhouse: {
-        ownerId: userId,
-      },
     },
   });
 
-  if (!role) {
-    throw new Error("Staff role not found or access denied");
+  if (!device) {
+    throw new Error("Device not found or access denied");
+  }
+
+  if (device.greenhouseId !== null && device.greenhouseId !== greenhouseId) {
+    throw new Error("Device not found or access denied");
   }
 
   if (macAddress !== undefined && macAddress.trim() !== "") {
@@ -158,17 +161,18 @@ export const updateDevice = async (deviceId, greenhouseId, userId, payload) => {
   if (name !== undefined) dataUpdate.name = name;
   if (macAddress !== undefined) dataUpdate.macAddress = macAddress;
   if (areaId !== undefined) dataUpdate.areaId = areaId;
+  if (greenhouseId !== undefined) dataUpdate.greenhouseId = greenhouseId;
 
   console.log("data update", dataUpdate);
 
-  const device = await prisma.device.update({
+  const deviceUpdate = await prisma.device.update({
     where: {
       id: deviceId,
     },
     data: dataUpdate,
   });
 
-  return device;
+  return deviceUpdate;
 };
 
 export const deleteDevice = async (deviceId, greenhouseId, userId) => {

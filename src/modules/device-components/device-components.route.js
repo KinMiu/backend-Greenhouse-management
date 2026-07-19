@@ -25,9 +25,9 @@ router.get(
 );
 
 router.post(
-  "/:greenhouseId/:id",
+  "/:id",
   verifyToken,
-  authorizeRole(["OWNER"]),
+  authorizeRole(["OWNER", "SUPER_ADMIN"]),
   validate(createComponentSchema),
   createDeviceComponentController,
 );

@@ -27,35 +27,18 @@ export const getMyGreenhouseDevice = async (greenhouseId, userId) => {
   return devices;
 };
 
-export const createDeviceComponent = async (
-  deviceId,
-  greenhouseId,
-  userId,
-  payload,
-) => {
-  const {name, type, category, unit, pin} = payload;
+export const createDeviceComponent = async (deviceId, userId, payload) => {
   console.log(payload);
+  const {name, type, category, unit, pin} = payload;
 
-  const greenhouse = await prisma.greenhouse.findFirst({
+  const superAdminValidation = await prisma.user.findUnique({
     where: {
-      id: greenhouseId,
-      ownerId: userId,
+      id: userId,
     },
   });
 
-  if (!greenhouse || greenhouse.ownerId !== userId) {
-    throw new Error("Greenhouse not found or access denied");
-  }
-
-  const device = await prisma.device.findFirst({
-    where: {
-      id: deviceId,
-      greenhouseId: greenhouseId,
-    },
-  });
-
-  if (!device) {
-    throw new Error("Device not found or access denied");
+  if (!superAdminValidation || superAdminValidation.role !== "SUPER_ADMIN") {
+    throw new Error("access denied");
   }
 
   const deviceComponents = await prisma.deviceComponents.create({
